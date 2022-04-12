@@ -1,0 +1,57 @@
+{
+  "name": "start-config",
+  "version": "1.0.0",
+  "description": "Default start config for projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "watch": "jest --watch",
+    "start": "webpack serve --open",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vasiliiperfilev/start-config.git"
+  },
+  "keywords": [
+    "config"
+  ],
+  "author": "Vasilii Perfilev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vasiliiperfilev/start-config/issues"
+  },
+  "homepage": "https://github.com/vasiliiperfilev/start-config#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.5",
+    "babel-jest": "^27.5.1",
+    "babel-loader": "^8.2.4",
+    "babel-preset-airbnb": "^5.0.0",
+    "css-loader": "^6.5.1",
+    "eslint": "^8.11.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^26.1.4",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.29.3",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "html-loader": "^3.1.0",
+    "html-webpack-plugin": "^5.5.0",
+    "jest": "^27.5.1",
+    "prettier": "^2.5.1",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.7.2"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+      "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js"
+    }
+  }
+}
