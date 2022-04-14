@@ -2,44 +2,75 @@ import Gameboard from '../../objects/Gameboard';
 
 let gb;
 beforeEach(() => {
-  gb = new Gameboard();
+  gb = Gameboard();
 });
 
 describe('testing ship placement', () => {
   test('Normal placement by x ax', () => {
-    expect(gb.addShip(4, 0, [0, 0])).toBe(true);
+    gb = gb.addShip(4, 0, [0, 0]);
     [0, 1, 2, 3].forEach((x) => {
-      expect(gb.getState([x, 0]).shipKey).toBe(0);
-      expect(gb.getState([x, 0]).position).toBe(x);
+      expect(gb.getBoardSquare([x, 0]).shipKey).toBe(0);
+      expect(gb.getBoardSquare([x, 0]).position).toBe(x);
     });
   });
 
   test('Normal placement by y ax', () => {
-    expect(gb.addShip(4, 1, [0, 0])).toBe(true);
+    gb = gb.addShip(4, 1, [0, 0]);
     [0, 1, 2, 3].forEach((y) => {
-      expect(gb.getState([0, y]).shipKey).toBe(0);
-      expect(gb.getState([0, y]).position).toBe(y);
+      expect(gb.getBoardSquare([0, y]).shipKey).toBe(0);
+      expect(gb.getBoardSquare([0, y]).position).toBe(y);
     });
   });
 
   test('Out of bound placement', () => {
-    expect(gb.addShip(4, 0, [9, 9])).toBe(false);
-    expect(gb.getState([9, 9]).shipKey).toBe(null);
-    expect(gb.getState([9, 9]).position).toBe(null);
+    expect(() => gb.addShip(4, 0, [9, 9])).toThrow();
   });
 
   test('Ship cross placement', () => {
-    gb.addShip(4, 0, [0, 0]);
-    expect(gb.addShip(1, 0, [0, 0])).toBe(false);
+    gb = gb.addShip(4, 0, [0, 0]);
+    expect(() => gb.addShip(3, 0, [0, 0])).toThrow('Space is occupied');
   });
 });
 
-describe('testing recieveAttack', () => {
+describe('testing receiveAttack', () => {
+  beforeEach(() => {
+    gb = gb.addShip(2, 0, [0, 0]);
+  });
 
+  test('Hit attacks', () => {
+    gb = gb.receiveAttack([0, 0]);
+    expect(gb.getShips()[0].isSunk()).toBe(false);
+    gb = gb.receiveAttack([1, 0]);
+    expect(gb.getShips()[0].isSunk()).toBe(true);
+  });
+
+  test('Miss attack', () => {
+    gb = gb.receiveAttack([0, 1]);
+    expect(gb.getBoardSquare([0, 1]).position).toBe('Missed attack');
+  });
+});
+
+describe('testing ifAllSunk', () => {
+  beforeEach(() => {
+    gb = gb.addShip(2, 0, [0, 0]);
+  });
+
+  test('One sunk ship', () => {
+    gb = gb.receiveAttack([0, 0]);
+    gb = gb.receiveAttack([1, 0]);
+    expect(gb.ifAllSunk()).toBe(true);
+  });
+
+  test('One sunk, another not', () => {
+    gb = gb.receiveAttack([0, 0]);
+    gb = gb.receiveAttack([1, 0]);
+    gb = gb.addShip(2, 0, [0, 1]);
+    expect(gb.ifAllSunk()).toBe(false);
+  });
 });
 
 test('Gameboard created', () => {
-  expect(gb.getState()).toStrictEqual({
+  expect(gb.getBoardSquare()).toStrictEqual({
     '0,0': { position: null, shipKey: null },
     '0,1': { position: null, shipKey: null },
     '0,2': { position: null, shipKey: null },

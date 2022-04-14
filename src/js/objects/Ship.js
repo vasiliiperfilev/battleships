@@ -5,14 +5,10 @@ function Ship(length, number) {
     throw new Error('You must provide a number');
   }
 
-  const status = Array(length).fill(0);
+  const state = Array(length).fill(0);
 
   function getLength() {
     return length;
-  }
-
-  function getState() {
-    return [...status];
   }
 
   function getBoardKey() {
@@ -27,19 +23,18 @@ function Ship(length, number) {
     if (position > this.getLength() - 1 || position < 0 || typeof position !== 'number') {
       throw new Error('Incorrect hit position');
     }
-    if (status[position] === 0) {
-      status[position] = 1;
-      return this.getState();
+    if (state[position] === 0) {
+      state[position] = 1;
+      return [...state];
     }
     return false;
   }
 
   function isSunk() {
-    return this.getState().reduce((a, b) => a + b, 0) === this.getLength();
+    return state.reduce((a, b) => a + b, 0) === this.getLength();
   }
   return {
     getLength,
-    getState,
     getBoardKey,
     setBoardKey,
     hit,
