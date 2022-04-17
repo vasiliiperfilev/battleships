@@ -40,6 +40,7 @@ describe('testing receiveAttack', () => {
   test('Hit attacks', () => {
     gb = gb.receiveAttack([0, 0]);
     expect(gb.getShips()[0].isSunk()).toBe(false);
+    expect(gb.getBoardSquare([0, 0]).position).toBe('Hit attack');
     gb = gb.receiveAttack([1, 0]);
     expect(gb.getShips()[0].isSunk()).toBe(true);
   });

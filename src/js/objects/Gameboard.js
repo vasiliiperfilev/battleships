@@ -5,15 +5,23 @@ function Gameboard(board = {}, ships = []) {
   // initial board constructor
   if (Object.keys(board).length === 0) {
     const newBoard = {};
-    Array.from({ length: 10 }, (_, i) => i).forEach((num1) => {
-      Array.from({ length: 10 }, (_, i) => i).forEach((num2) => {
+    Array.from(Array(10).keys()).forEach((num1) => {
+      Array.from(Array(10).keys()).forEach((num2) => {
         newBoard[[num1, num2].join(',')] = { shipKey: null, position: null };
       });
     });
     return Gameboard(newBoard);
   }
 
-  const toKey = (arr) => arr.join(',');
+  const toKey = (arr) => {
+    if (arr.length !== 2 || typeof arr[0] !== 'number' || typeof arr[1] !== 'number') {
+      throw new Error('Incorrect array structure');
+    }
+    if (arr[0] > 9 || arr[0] < 0 || arr[1] > 9 || arr[1] < 0) {
+      throw new Error('Incorrect square coordinates');
+    }
+    return arr.join(',');
+  };
 
   function getBoardSquare(coordsArr) {
     if (arguments.length === 0) return { ...board };
@@ -71,6 +79,7 @@ function Gameboard(board = {}, ships = []) {
     const { shipKey, position } = newBoard[toKey(coordsArr)];
     if (shipKey !== null) {
       newShips[shipKey].hit(position);
+      newBoard[toKey(coordsArr)].position = 'Hit attack';
     } else {
       newBoard[toKey(coordsArr)].position = 'Missed attack';
     }
