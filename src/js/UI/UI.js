@@ -40,7 +40,8 @@ function UI(player1Name, player2Name) {
     Array.from(Array(10).keys()).forEach((num1) => {
       Array.from(Array(10).keys()).forEach((num2) => {
         const square = document.createElement('div');
-        square.classList.add(num1, num2);
+        square.dataset.x = num1;
+        square.dataset.y = num2;
         styleGbSquare(square, gameBoard.getBoardSquare([num1, num2]).position);
         gameBoardDiv.append(square);
       });
@@ -74,7 +75,7 @@ function UI(player1Name, player2Name) {
   }
 
   function getTurnInput(e) {
-    return [...e.target.classList].slice(0, 1);
+    return [e.target.dataset.x, e.target.dataset.y];
   }
 
   return {
