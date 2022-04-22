@@ -7,12 +7,14 @@ function Player(isAI = false) {
     return gameBoard.receiveAttack(coordsArr);
   }
 
+  // change gameBoard arg to gbReceiveAttackFunc
   function takeTurn(gameBoard, coordsArray) {
     if (isAI === false) return gameBoard.receiveAttack(coordsArray);
     return takeTurnAI(gameBoard);
   }
 
   return {
+    isAI,
     takeTurn,
   };
 }

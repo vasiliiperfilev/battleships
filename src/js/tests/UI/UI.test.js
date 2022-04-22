@@ -45,7 +45,7 @@ test('New board state render', () => {
   // do hit attack
   gb1 = gb1.receiveAttack([0, 0]);
   // rerender gameboard
-  ui.renderPage(gb1, gb2);
+  ui.updateBoard(gb1, document.body.querySelector('.player1.gameboard'));
   // check if state of the first square changed
   expect(document.body.querySelector('.player1.gameboard').children[0].classList[0]).toBe('hit');
 });

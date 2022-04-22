@@ -43,7 +43,7 @@ function UI() {
       square.classList.add('ship');
     }
   }
-
+  // TODO: change gameBoard argument to gbSquareStateArr
   function createGbDiv(gameBoard) {
     const gameBoardDiv = document.createElement('div');
     Array.from(Array(10).keys()).forEach((num1) => {
@@ -64,31 +64,25 @@ function UI() {
     });
   }
 
-  function updateBoards(gameBoard1, gameBoard2) {
-    document.querySelector('.player1.gameboard').textContent = '';
-    document.querySelector('.player2.gameboard').textContent = '';
-    document
-      .querySelector('.player1.gameboard')
-      .replaceChildren(...createGbDiv(gameBoard1).children);
-    document
-      .querySelector('.player2.gameboard')
-      .replaceChildren(...createGbDiv(gameBoard2).children);
-    hideShips(document.querySelector('.player2.gameboard'));
+  function updateBoard(gameBoard, gameBoardDiv) {
+    gameBoardDiv.replaceChildren(...createGbDiv(gameBoard).children);
   }
 
   function renderPage(gameBoard1, gameBoard2) {
     document.querySelector('body').textContent = '';
     const header = createHeader();
     const main = document.createElement('main');
-    const gb1 = document.createElement('div');
-    const gb2 = document.createElement('div');
-    gb1.classList.add('player1', 'gameboard');
-    gb2.classList.add('player2', 'gameboard');
-    main.append(gb1, gb2);
+    const gb1Div = document.createElement('div');
+    const gb2Div = document.createElement('div');
+    gb1Div.classList.add('player1', 'gameboard');
+    gb2Div.classList.add('player2', 'gameboard');
+    main.append(gb1Div, gb2Div);
     const footer = createFooter();
     const result = createResult();
     document.querySelector('body').append(header, main, footer, result);
-    updateBoards(gameBoard1, gameBoard2);
+    updateBoard(gameBoard1, gb1Div);
+    updateBoard(gameBoard2, gb2Div);
+    hideShips(gb2Div);
   }
 
   function getTurnInput(e) {
@@ -102,7 +96,7 @@ function UI() {
 
   return {
     renderPage,
-    updateBoards,
+    updateBoard,
     getTurnInput,
     showResult,
   };
