@@ -36,7 +36,7 @@ describe('testing player turn', () => {
     }
     for (let i = 0; i < 10; i += 1) {
       for (let j = 0; j < 10; j += 1) {
-        // all squares where hit by AI
+        // all squares were hit by AI
         expect(gb.getBoardSquare([i, j]).position).toBeTruthy();
       }
     }

@@ -33,7 +33,7 @@ function Gameboard(board = {}, ships = []) {
   }
 
   function ifAllSunk() {
-    return ships.every((ship) => ship.isSunk());
+    return ships.every((ship) => ship.isSunk()) || ships.length === 0;
   }
 
   // direction 0 for x (letters in UI), 1 for y (numbers in UI) in decart

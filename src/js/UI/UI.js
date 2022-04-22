@@ -1,7 +1,6 @@
 import GitHubLogo from '../../assets/GitHubLogo.png';
 
-function UI(player1Name, player2Name) {
-  // TODO: change square nums https://stackoverflow.com/questions/432174/how-to-store-arbitrary-data-for-some-html-tags
+function UI() {
   function createHeader() {
     const header = document.createElement('header');
     const h1 = document.createElement('h1');
@@ -23,6 +22,16 @@ function UI(player1Name, player2Name) {
     link.append(img);
     footer.append(link);
     return footer;
+  }
+
+  function createResult() {
+    const result = document.createElement('div');
+    result.classList.add('result', 'hidden');
+    const resultText = document.createElement('span');
+    const restartBtn = document.createElement('btn');
+    restartBtn.classList.add('restart');
+    result.append(resultText, restartBtn);
+    return result;
   }
 
   function styleGbSquare(square, state) {
@@ -55,33 +64,47 @@ function UI(player1Name, player2Name) {
     });
   }
 
-  function renderPage(gameBoard1, gameBoard2) {
-    const header = createHeader();
-    const main = document.createElement('main');
-    const player1Gb = createGbDiv(gameBoard1);
-    player1Gb.classList.add(player1Name);
-    const player2Gb = createGbDiv(gameBoard2);
-    player2Gb.classList.add(player2Name);
-    hideShips(player2Gb);
-    const footer = createFooter();
-    main.append(player1Gb, player2Gb);
-    document.querySelector('body').append(header, main, footer);
+  function updateBoards(gameBoard1, gameBoard2) {
+    document.querySelector('.player1.gameboard').textContent = '';
+    document.querySelector('.player2.gameboard').textContent = '';
+    document
+      .querySelector('.player1.gameboard')
+      .replaceChildren(...createGbDiv(gameBoard1).children);
+    document
+      .querySelector('.player2.gameboard')
+      .replaceChildren(...createGbDiv(gameBoard2).children);
+    hideShips(document.querySelector('.player2.gameboard'));
   }
 
-  function renderNewGbDiv(currentGbDiv, gameBoard, playerName) {
-    const newGbDiv = createGbDiv(gameBoard);
-    newGbDiv.classList.add(playerName);
-    currentGbDiv.parentNode.replaceChild(newGbDiv, currentGbDiv);
+  function renderPage(gameBoard1, gameBoard2) {
+    document.querySelector('body').textContent = '';
+    const header = createHeader();
+    const main = document.createElement('main');
+    const gb1 = document.createElement('div');
+    const gb2 = document.createElement('div');
+    gb1.classList.add('player1', 'gameboard');
+    gb2.classList.add('player2', 'gameboard');
+    main.append(gb1, gb2);
+    const footer = createFooter();
+    const result = createResult();
+    document.querySelector('body').append(header, main, footer, result);
+    updateBoards(gameBoard1, gameBoard2);
   }
 
   function getTurnInput(e) {
-    return [e.target.dataset.x, e.target.dataset.y];
+    return [parseInt(e.target.dataset.x, 10), parseInt(e.target.dataset.y, 10)];
+  }
+
+  function showResult(result) {
+    document.querySelector('.result > span').textContent = result;
+    document.querySelector('.result').classList.remove('hidden');
   }
 
   return {
     renderPage,
-    renderNewGbDiv,
+    updateBoards,
     getTurnInput,
+    showResult,
   };
 }
 
