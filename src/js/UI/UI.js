@@ -43,7 +43,7 @@ function UI() {
       square.classList.add('ship');
     }
   }
-  // TODO: change gameBoard argument to gbSquareStateArr
+
   function createGbDiv(gameBoard) {
     const gameBoardDiv = document.createElement('div');
     Array.from(Array(10).keys()).forEach((num1) => {

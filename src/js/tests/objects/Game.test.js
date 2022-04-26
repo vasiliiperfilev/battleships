@@ -16,6 +16,7 @@ describe('Player 1 turns vs AI and wins', () => {
   });
 
   test('One turn Player vs AI', () => {
+    console.log(document.querySelector('.player2.gameboard'));
     document.querySelector('.player2.gameboard').children[0].click();
     // hit class added to the clicked square of player2(AI) board
     expect(document.querySelector('.player2.gameboard').children[0].classList[0]).toBe('hit');
@@ -66,4 +67,30 @@ describe('Player 2 wins or draw', () => {
     expect(document.querySelector('.result').classList.contains('hidden')).toBe(false);
     expect(document.querySelector('.result > span').textContent).toBe('Draw!');
   });
+});
+
+test('Restart', () => {
+  let playerGb = Gameboard();
+  let AiGb = Gameboard();
+  playerGb = playerGb.addShip(3, 0, [0, 0]);
+  AiGb = AiGb.addShip(2, 0, [0, 0]);
+  Game(playerGb, AiGb);
+  document.querySelector('.player2.gameboard').children[0].click();
+  document.querySelector('.player2.gameboard').children[10].click();
+  document.querySelector('.restart').click();
+  // result hidden
+  expect(document.querySelector('.result').classList.contains('hidden')).toBe(true);
+  // no attacks were made
+  expect(
+    [...document.querySelector('.player1.gameboard').children].reduce((prev, child) => {
+      if (child.classList.contains('hit') || child.classList.contains('miss')) return prev + 1;
+      return prev;
+    }, 0)
+  ).toBe(0);
+  expect(
+    [...document.querySelector('.player2.gameboard').children].reduce((prev, child) => {
+      if (child.classList.contains('hit') || child.classList.contains('miss')) return prev + 1;
+      return prev;
+    }, 0)
+  ).toBe(0);
 });
