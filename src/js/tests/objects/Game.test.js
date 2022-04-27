@@ -16,7 +16,6 @@ describe('Player 1 turns vs AI and wins', () => {
   });
 
   test('One turn Player vs AI', () => {
-    console.log(document.querySelector('.player2.gameboard'));
     document.querySelector('.player2.gameboard').children[0].click();
     // hit class added to the clicked square of player2(AI) board
     expect(document.querySelector('.player2.gameboard').children[0].classList[0]).toBe('hit');

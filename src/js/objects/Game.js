@@ -59,7 +59,6 @@ function Game(gb1 = Gameboard(), gb2 = Gameboard(), plr1 = Player(), plr2 = Play
   document.querySelector('.restart').addEventListener('click', () => {
     Game(gb1, gb2, plr1, plr2);
   });
-  // TODO: create separate AI factory function, add isLegitTurn to gameboard
 }
 
 export default Game;

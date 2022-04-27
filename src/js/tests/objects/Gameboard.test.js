@@ -23,12 +23,26 @@ describe('testing ship placement', () => {
   });
 
   test('Out of bound placement', () => {
-    expect(() => gb.addShip(4, 0, [9, 9])).toThrow();
+    expect(() => gb.addShip(4, 0, [9, 9])).toThrow('Incorrect square coordinates');
   });
 
   test('Ship cross placement', () => {
     gb = gb.addShip(4, 0, [0, 0]);
     expect(() => gb.addShip(3, 0, [0, 0])).toThrow('Space is occupied');
+  });
+
+  test('Ship placed too close', () => {
+    gb = gb.addShip(4, 0, [0, 0]);
+    expect(() => gb.addShip(3, 0, [4, 0])).toThrow('Space is occupied');
+    expect(() => gb.addShip(3, 0, [0, 1])).toThrow('Space is occupied');
+  });
+
+  test('Ships placed around with 1 square gaps', () => {
+    gb = gb.addShip(4, 0, [0, 0]);
+    // below
+    expect(() => gb.addShip(3, 0, [5, 0])).not.toThrow();
+    // to right
+    expect(() => gb.addShip(3, 0, [0, 2])).not.toThrow();
   });
 });
 
@@ -65,7 +79,7 @@ describe('testing ifAllSunk', () => {
   test('One sunk, another not', () => {
     gb = gb.receiveAttack([0, 0]);
     gb = gb.receiveAttack([1, 0]);
-    gb = gb.addShip(2, 0, [0, 1]);
+    gb = gb.addShip(2, 0, [0, 2]);
     expect(gb.ifAllSunk()).toBe(false);
   });
 });
