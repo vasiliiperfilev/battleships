@@ -1,15 +1,19 @@
 function Player(isAI = false) {
-  function takeTurnAI(gameBoard) {
+  function getAImove(gameBoard) {
     let coordsArr = [Math.round(Math.random() * 9), Math.round(Math.random() * 9)];
-    while (['Missed attack', 'Hit attack'].includes(gameBoard.getSquare(coordsArr).position)) {
+    while (typeof gameBoard.getShipPosition(...coordsArr) === 'string') {
       coordsArr = [Math.round(Math.random() * 9), Math.round(Math.random() * 9)];
     }
-    return gameBoard.receiveAttack(coordsArr);
+    return coordsArr;
   }
 
-  function takeTurn(gameBoard, coordsArray) {
-    if (isAI === false) return gameBoard.receiveAttack(coordsArray);
-    return takeTurnAI(gameBoard);
+  function takeTurn(gameBoard, coordsArr) {
+    const coords = isAI ? getAImove(gameBoard) : coordsArr;
+    if (!gameBoard.wasSquareAttacked(coords)) {
+      gameBoard.receiveAttack(coords);
+    } else {
+      throw new Error('Position was attacked before');
+    }
   }
 
   return {

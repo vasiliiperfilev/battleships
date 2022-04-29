@@ -1,5 +1,3 @@
-function sum(a, b) {
-  return a + b;
-}
+import Game from './objects/Game';
 
-export default sum;
+Game();

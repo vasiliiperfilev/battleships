@@ -1,45 +1,35 @@
-/* eslint-disable no-param-reassign */
-function Ship(length, number) {
-  if (length < 2) throw new Error('Min.length is 2');
-  if (length === undefined || typeof length !== 'number') {
-    throw new Error('You must provide a number');
+class Ship {
+  #length;
+
+  #state;
+
+  constructor(length) {
+    if (length < 2) throw new Error('Min.length is 2');
+    if (length === undefined || typeof length !== 'number') {
+      throw new Error('You must provide a number');
+    }
+    this.#length = length;
+    this.#state = Array(length).fill(0);
   }
 
-  const state = Array(length).fill(0);
-
-  function getLength() {
-    return length;
+  getLength() {
+    return this.#length;
   }
 
-  function getBoardKey() {
-    return number;
-  }
-
-  function setBoardKey(newNumber) {
-    number = newNumber;
-  }
-
-  function hit(position) {
+  hit(position) {
     if (position > this.getLength() - 1 || position < 0 || typeof position !== 'number') {
       throw new Error('Incorrect hit position');
     }
-    if (state[position] === 0) {
-      state[position] = 1;
-      return [...state];
+    if (this.#state[position] === 0) {
+      this.#state[position] = 1;
+      return true;
     }
     return false;
   }
 
-  function isSunk() {
-    return state.reduce((a, b) => a + b, 0) === this.getLength();
+  isSunk() {
+    return this.#state.reduce((a, b) => a + b, 0) === this.getLength();
   }
-  return {
-    getLength,
-    getBoardKey,
-    setBoardKey,
-    hit,
-    isSunk,
-  };
 }
 
 export default Ship;

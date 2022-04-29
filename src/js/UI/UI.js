@@ -51,7 +51,7 @@ function UI() {
         const square = document.createElement('div');
         square.dataset.x = num2;
         square.dataset.y = num1;
-        styleGbSquare(square, gameBoard.getSquare([num2, num1]).position);
+        styleGbSquare(square, gameBoard.getShipPosition(num2, num1));
         gameBoardDiv.append(square);
       });
     });

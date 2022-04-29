@@ -3,47 +3,26 @@ import UI from '../UI/UI';
 import Gameboard from './Gameboard';
 import Player from './Player';
 
-function Game(
-  shipsToPlace = [],
-  gb1 = Gameboard(),
-  gb2 = Gameboard(),
-  plr1 = Player(),
-  plr2 = Player(true)
-) {
+function Game(gb1 = Gameboard(), gb2 = Gameboard(), plr1 = Player(), plr2 = Player(true)) {
   const ui = UI();
   const player1 = cloneDeep(plr1);
   const player2 = cloneDeep(plr2);
-  let player1Gb = cloneDeep(gb1);
-  let player2Gb = cloneDeep(gb2);
-  let activePlayer = null;
+  const player1Gb = cloneDeep(gb1);
+  const player2Gb = cloneDeep(gb2);
+  let activePlayer = player1;
 
   function switchPlayerTurn() {
     activePlayer = activePlayer === player1 ? player2 : player1;
   }
 
-  // function tryPlace(gb, coords) {
-  //   try {
-  //     gb.addShip(shipsInGame[0], coords);
-  //     shipsInGame.shift();
-  //   } catch (err) {
-  //     console.log(err.message);
-  //   }
-  // }
-
-  // function placeShip(event, gb) {
-  //   if (gb.getShips().length < shipsInGame.length) {
-  //     tryPlace(gb, ui.getTurnInput(event));
-  //   } else {
-  //     activePlayer = player1;
-  //     event.currentTarget.removeEventListener('click', placeShip);
-  //   }
-  // }
-
   function playRound(player, enemyGb, event) {
-    const newGb = player.takeTurn(enemyGb, ui.getTurnInput(event));
-    switchPlayerTurn();
-    ui.updateBoard(newGb, event.currentTarget);
-    return newGb;
+    try {
+      player.takeTurn(enemyGb, ui.getTurnInput(event));
+      switchPlayerTurn();
+      ui.updateBoard(enemyGb, event.currentTarget);
+    } catch (err) {
+      console.log(err.message);
+    }
   }
 
   function getGameResult(isAllSunkPlayer1, isAllSunkPlayer2) {
@@ -55,15 +34,15 @@ function Game(
   }
 
   ui.renderPage(player1Gb, player2Gb);
-  document.querySelector('.rotate').addEventListener('click', () => {
-    player1Gb.changeNextShipDirection();
-  });
 
-  function placeShip(event) {
+  document
+    .querySelector('.rotate')
+    .addEventListener('click', () => player1Gb.changeNextShipDirection());
+
+  function placeShip(gb, event) {
     try {
-      player1Gb = player1Gb.addShip(shipsToPlace[0], ui.getTurnInput(event));
-      shipsToPlace.shift();
-      if (shipsToPlace.length === 0) {
+      gb.addShip(null, ui.getTurnInput(event));
+      if (gb.getShipsToPlaceLengths().length === 0) {
         activePlayer = player1;
         ui.hideRotateBtn();
         event.currentTarget.removeEventListener('click', placeShip);
@@ -71,36 +50,27 @@ function Game(
     } catch (err) {
       console.log(err.message);
     }
-    ui.updateBoard(player1Gb, event.currentTarget);
+    ui.updateBoard(gb, event.currentTarget);
   }
 
-  document.querySelector('.player1.gameboard').addEventListener('click', placeShip);
-
-  if (shipsToPlace.length === 0) {
-    activePlayer = player1;
-    ui.hideRotateBtn();
-    document.querySelector('.player1.gameboard').removeEventListener('click', placeShip);
+  if (player1Gb.getShipsToPlaceLengths().length > 0) {
+    activePlayer = null;
+    document
+      .querySelector('.player1.gameboard')
+      .addEventListener('click', (event) => placeShip(player1Gb, event));
   }
 
   document.querySelector('.player1.gameboard').addEventListener('click', (event) => {
-    if (
-      !event.target.classList.contains('hit') &&
-      !event.target.classList.contains('miss') &&
-      activePlayer === player2
-    ) {
-      player1Gb = playRound(player2, player1Gb, event);
+    if (activePlayer === player2) {
+      playRound(player2, player1Gb, event);
       const result = getGameResult(player1Gb.ifAllSunk(), player2Gb.ifAllSunk());
       if (result !== undefined) ui.showResult(result);
     }
   });
 
   document.querySelector('.player2.gameboard').addEventListener('click', (event) => {
-    if (
-      !event.target.classList.contains('hit') &&
-      !event.target.classList.contains('miss') &&
-      activePlayer === player1
-    ) {
-      player2Gb = playRound(player1, player2Gb, event);
+    if (activePlayer === player1) {
+      playRound(player1, player2Gb, event);
       if (player2.isAI) document.querySelector('.player1.gameboard').click();
     }
   });

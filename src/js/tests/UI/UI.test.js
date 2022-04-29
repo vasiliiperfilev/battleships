@@ -11,8 +11,8 @@ beforeEach(() => {
   ui = UI();
   gb1 = Gameboard();
   gb2 = Gameboard();
-  gb1 = gb1.addShip(2, [0, 0]);
-  gb2 = gb2.addShip(2, [0, 0]);
+  gb1.addShip(2, [0, 0]);
+  gb2.addShip(2, [0, 0]);
   ui.renderPage(gb1, gb2);
 });
 
@@ -43,7 +43,7 @@ test('AI ships are hidden', () => {
 
 test('New board state render', () => {
   // do hit attack
-  gb1 = gb1.receiveAttack([0, 0]);
+  gb1.receiveAttack([0, 0]);
   // rerender gameboard
   ui.updateBoard(gb1, document.body.querySelector('.player1.gameboard'));
   // check if state of the first square changed

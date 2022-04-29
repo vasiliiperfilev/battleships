@@ -15,12 +15,12 @@ test('Length is number', () => {
 
 describe('testing hit method', () => {
   test('Normal hit', () => {
-    expect(ship.hit(3)).toStrictEqual([0, 0, 0, 1]);
+    expect(ship.hit(3)).toBe(true);
   });
 
   test('Multiple hits', () => {
     ship.hit(0);
-    expect(ship.hit(3)).toStrictEqual([1, 0, 0, 1]);
+    expect(ship.hit(3)).toBe(true);
   });
 
   test('Position > length', () => {
