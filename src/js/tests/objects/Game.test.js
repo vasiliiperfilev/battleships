@@ -5,14 +5,75 @@ import Game from '../../objects/Game';
 import Gameboard from '../../objects/Gameboard';
 import Player from '../../objects/Player';
 
+describe('Player vs AI ship placement', () => {
+  beforeEach(() => {
+    const playerGb = Gameboard();
+    const AiGb = Gameboard();
+    Game([5, 4, 3, 3, 2], playerGb, AiGb);
+    // place 5 ships horizontaly
+    document.querySelector('.player1.gameboard').children[0].click();
+    document.querySelector('.player1.gameboard').children[20].click();
+    document.querySelector('.player1.gameboard').children[40].click();
+    document.querySelector('.player1.gameboard').children[60].click();
+    // last ship is vertical
+    document.querySelector('.rotate').click();
+    document.querySelector('.player1.gameboard').children[66].click();
+  });
+
+  test('5 square ship placed horizontaly', () => {
+    for (let i = 0; i < 5; i += 1) {
+      expect(
+        document.querySelector('.player1.gameboard').children[i].classList.contains('ship')
+      ).toBe(true);
+    }
+  });
+
+  test('4 square ship placed horizontaly', () => {
+    for (let i = 20; i < 24; i += 1) {
+      expect(
+        document.querySelector('.player1.gameboard').children[i].classList.contains('ship')
+      ).toBe(true);
+    }
+  });
+
+  test('First 3 square ship placed horizontaly', () => {
+    for (let i = 40; i < 43; i += 1) {
+      expect(
+        document.querySelector('.player1.gameboard').children[i].classList.contains('ship')
+      ).toBe(true);
+    }
+  });
+
+  test('Second 3 square ship placed horizontaly', () => {
+    for (let i = 60; i < 63; i += 1) {
+      expect(
+        document.querySelector('.player1.gameboard').children[i].classList.contains('ship')
+      ).toBe(true);
+    }
+  });
+
+  test('2 square ship placed verticaly', () => {
+    expect(
+      document.querySelector('.player1.gameboard').children[66].classList.contains('ship')
+    ).toBe(true);
+    expect(
+      document.querySelector('.player1.gameboard').children[76].classList.contains('ship')
+    ).toBe(true);
+  });
+
+  test('Rotate button is hidden', () => {
+    expect(document.querySelector('.rotate').classList.contains('hidden')).toBe(true);
+  });
+});
+
 describe('Player 1 turns vs AI and wins', () => {
   beforeEach(() => {
     // game created with predefined ships positions
     let playerGb = Gameboard();
     let AiGb = Gameboard();
-    playerGb = playerGb.addShip(3, 0, [0, 0]);
-    AiGb = AiGb.addShip(2, 0, [0, 0]);
-    Game(playerGb, AiGb);
+    playerGb = playerGb.addShip(3, [0, 0]);
+    AiGb = AiGb.addShip(2, [0, 0]);
+    Game([], playerGb, AiGb);
   });
 
   test('One turn Player vs AI', () => {
@@ -31,7 +92,7 @@ describe('Player 1 turns vs AI and wins', () => {
   test('Player wins', () => {
     expect(document.querySelector('.result').classList.contains('hidden')).toBe(true);
     document.querySelector('.player2.gameboard').children[0].click();
-    document.querySelector('.player2.gameboard').children[10].click();
+    document.querySelector('.player2.gameboard').children[1].click();
     expect(document.querySelector('.result').classList.contains('hidden')).toBe(false);
     expect(document.querySelector('.result > span').textContent).toBe('Player 1 won!');
   });
@@ -42,17 +103,17 @@ describe('Player 2 wins or draw', () => {
     // game created with predefined ships positions
     let player1Gb = Gameboard();
     let player2Gb = Gameboard();
-    player1Gb = player1Gb.addShip(2, 0, [0, 0]);
-    player2Gb = player2Gb.addShip(2, 0, [0, 0]);
-    Game(player1Gb, player2Gb, Player(), Player());
+    player1Gb = player1Gb.addShip(2, [0, 0]);
+    player2Gb = player2Gb.addShip(2, [0, 0]);
+    Game([], player1Gb, player2Gb, Player(), Player());
   });
 
   test('Player 2 wins', () => {
     // Players turns to simulate Player 2 win
     document.querySelector('.player2.gameboard').children[0].click();
     document.querySelector('.player1.gameboard').children[0].click();
-    document.querySelector('.player2.gameboard').children[11].click();
-    document.querySelector('.player1.gameboard').children[10].click();
+    document.querySelector('.player2.gameboard').children[2].click();
+    document.querySelector('.player1.gameboard').children[1].click();
     expect(document.querySelector('.result').classList.contains('hidden')).toBe(false);
     expect(document.querySelector('.result > span').textContent).toBe('Player 2 won!');
   });
@@ -61,8 +122,8 @@ describe('Player 2 wins or draw', () => {
     // Players turns to simulate Player 2 win
     document.querySelector('.player2.gameboard').children[0].click();
     document.querySelector('.player1.gameboard').children[0].click();
-    document.querySelector('.player2.gameboard').children[10].click();
-    document.querySelector('.player1.gameboard').children[10].click();
+    document.querySelector('.player2.gameboard').children[1].click();
+    document.querySelector('.player1.gameboard').children[1].click();
     expect(document.querySelector('.result').classList.contains('hidden')).toBe(false);
     expect(document.querySelector('.result > span').textContent).toBe('Draw!');
   });
@@ -71,11 +132,11 @@ describe('Player 2 wins or draw', () => {
 test('Restart', () => {
   let playerGb = Gameboard();
   let AiGb = Gameboard();
-  playerGb = playerGb.addShip(3, 0, [0, 0]);
-  AiGb = AiGb.addShip(2, 0, [0, 0]);
-  Game(playerGb, AiGb);
+  playerGb = playerGb.addShip(3, [0, 0]);
+  AiGb = AiGb.addShip(2, [0, 0]);
+  Game([], playerGb, AiGb);
   document.querySelector('.player2.gameboard').children[0].click();
-  document.querySelector('.player2.gameboard').children[10].click();
+  document.querySelector('.player2.gameboard').children[1].click();
   document.querySelector('.restart').click();
   // result hidden
   expect(document.querySelector('.result').classList.contains('hidden')).toBe(true);

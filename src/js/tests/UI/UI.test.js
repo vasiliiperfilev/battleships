@@ -11,8 +11,8 @@ beforeEach(() => {
   ui = UI();
   gb1 = Gameboard();
   gb2 = Gameboard();
-  gb1 = gb1.addShip(2, 0, [0, 0]);
-  gb2 = gb2.addShip(2, 0, [0, 0]);
+  gb1 = gb1.addShip(2, [0, 0]);
+  gb2 = gb2.addShip(2, [0, 0]);
   ui.renderPage(gb1, gb2);
 });
 

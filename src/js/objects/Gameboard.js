@@ -2,8 +2,6 @@ import { cloneDeep } from 'lodash';
 import Ship from './Ship';
 
 function Gameboard(board = {}, ships = []) {
-  const hitState = 'Hit attack';
-  const missState = 'Missed attack';
   // initial board constructor
   if (Object.keys(board).length === 0) {
     const newBoard = {};
@@ -14,6 +12,14 @@ function Gameboard(board = {}, ships = []) {
     });
     return Gameboard(newBoard);
   }
+  // TODO: add direction, add ships to place
+  const hitState = 'Hit attack';
+  const missState = 'Missed attack';
+  let shipDirection = 0;
+  const getPerpendicularDirection = () => 1 - shipDirection;
+  const changeNextShipDirection = () => {
+    shipDirection = 1 - shipDirection;
+  };
 
   function isValidCoords(coords) {
     const [x, y] = coords;
@@ -30,7 +36,7 @@ function Gameboard(board = {}, ships = []) {
     return arr.join(',');
   };
 
-  function getBoardSquare(coordsArr) {
+  function getSquare(coordsArr) {
     if (arguments.length === 0) return { ...board };
     return { ...board[toKey(coordsArr)] };
   }
@@ -43,47 +49,47 @@ function Gameboard(board = {}, ships = []) {
     return ships.every((ship) => ship.isSunk()) || ships.length === 0;
   }
 
-  function checkAdjacentSquares(centerCoords, direction) {
+  function checkAdjacentSquares(centerCoords) {
     for (let i = -1; i < 2; i += 1) {
       const newCoords = [...centerCoords];
-      newCoords[direction] += i;
+      newCoords[getPerpendicularDirection()] += i;
       if (isValidCoords(newCoords)) {
-        const adjacentSquare = getBoardSquare(newCoords);
+        const adjacentSquare = getSquare(newCoords);
         if (adjacentSquare.shipKey !== null) throw new Error('Space is occupied');
       }
     }
   }
 
   // direction 0 for x, 1 for y in decart
-  function checkFreeSpace(length, direction, startCoordsArr) {
+  function checkFreeSpace(length, startCoordsArr) {
     const coords = [...startCoordsArr];
-    checkAdjacentSquares(coords, 1 - direction);
+    checkAdjacentSquares(coords);
     if (length === -1) {
       return;
     }
-    coords[direction] += 1;
-    checkFreeSpace(length - 1, direction, coords);
+    coords[shipDirection] += 1;
+    checkFreeSpace(length - 1, coords);
   }
 
-  function placeShipOnBoard(ship, direction, startCoordsArr) {
+  function placeShipOnBoard(ship, startCoordsArr) {
     const newBoard = JSON.parse(JSON.stringify(board));
     [...Array(ship.getLength()).keys()].forEach((position) => {
       const coords = [...startCoordsArr];
-      coords[direction] += position;
+      coords[shipDirection] += position;
       newBoard[toKey(coords)].shipKey = ship.getBoardKey();
       newBoard[toKey(coords)].position = position;
     });
     return newBoard;
   }
 
-  function addShip(length, direction, startCoordsArr) {
+  function addShip(length, startCoordsArr) {
     const startOfOccupied = [...startCoordsArr];
-    startOfOccupied[direction] -= 1;
-    checkFreeSpace(length, direction, startOfOccupied);
+    startOfOccupied[shipDirection] -= 1;
+    checkFreeSpace(length, startOfOccupied);
     const newShipsArr = cloneDeep(ships);
     const ship = Ship(length, newShipsArr.length);
     newShipsArr.push(ship);
-    const newBoard = placeShipOnBoard(ship, direction, startCoordsArr);
+    const newBoard = placeShipOnBoard(ship, startCoordsArr);
     return Gameboard(newBoard, newShipsArr);
   }
 
@@ -101,7 +107,8 @@ function Gameboard(board = {}, ships = []) {
   }
 
   return {
-    getBoardSquare,
+    getSquare,
+    changeNextShipDirection,
     getShips,
     addShip,
     receiveAttack,

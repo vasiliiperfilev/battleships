@@ -49,9 +49,9 @@ function UI() {
     Array.from(Array(10).keys()).forEach((num1) => {
       Array.from(Array(10).keys()).forEach((num2) => {
         const square = document.createElement('div');
-        square.dataset.x = num1;
-        square.dataset.y = num2;
-        styleGbSquare(square, gameBoard.getBoardSquare([num1, num2]).position);
+        square.dataset.x = num2;
+        square.dataset.y = num1;
+        styleGbSquare(square, gameBoard.getSquare([num2, num1]).position);
         gameBoardDiv.append(square);
       });
     });
@@ -76,7 +76,9 @@ function UI() {
     const gb2Div = document.createElement('div');
     gb1Div.classList.add('player1', 'gameboard');
     gb2Div.classList.add('player2', 'gameboard');
-    main.append(gb1Div, gb2Div);
+    const rotateBtn = document.createElement('button');
+    rotateBtn.classList.add('rotate');
+    main.append(rotateBtn, gb1Div, gb2Div);
     const footer = createFooter();
     const result = createResult();
     document.querySelector('body').append(header, main, footer, result);
@@ -85,8 +87,8 @@ function UI() {
     hideShips(gb2Div);
   }
 
-  function getTurnInput(e) {
-    return [parseInt(e.target.dataset.x, 10), parseInt(e.target.dataset.y, 10)];
+  function getTurnInput(event) {
+    return [parseInt(event.target.dataset.x, 10), parseInt(event.target.dataset.y, 10)];
   }
 
   function showResult(result) {
@@ -94,11 +96,16 @@ function UI() {
     document.querySelector('.result').classList.remove('hidden');
   }
 
+  function hideRotateBtn() {
+    document.querySelector('.rotate').classList.add('hidden');
+  }
+
   return {
     renderPage,
     updateBoard,
     getTurnInput,
     showResult,
+    hideRotateBtn,
   };
 }
 

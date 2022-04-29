@@ -8,7 +8,7 @@ beforeEach(() => {
   player = Player();
   AI = Player(true);
   gb = Gameboard();
-  gb = gb.addShip(2, 0, [0, 0]);
+  gb = gb.addShip(2, [0, 0]);
 });
 
 describe('testing player turn', () => {
@@ -37,7 +37,7 @@ describe('testing player turn', () => {
     for (let i = 0; i < 10; i += 1) {
       for (let j = 0; j < 10; j += 1) {
         // all squares were hit by AI
-        expect(gb.getBoardSquare([i, j]).position).toBeTruthy();
+        expect(gb.getSquare([i, j]).position).toBeTruthy();
       }
     }
   });

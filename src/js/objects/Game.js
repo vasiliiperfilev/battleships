@@ -3,20 +3,41 @@ import UI from '../UI/UI';
 import Gameboard from './Gameboard';
 import Player from './Player';
 
-function Game(gb1 = Gameboard(), gb2 = Gameboard(), plr1 = Player(), plr2 = Player(true)) {
+function Game(
+  shipsToPlace = [],
+  gb1 = Gameboard(),
+  gb2 = Gameboard(),
+  plr1 = Player(),
+  plr2 = Player(true)
+) {
   const ui = UI();
   const player1 = cloneDeep(plr1);
   const player2 = cloneDeep(plr2);
   let player1Gb = cloneDeep(gb1);
   let player2Gb = cloneDeep(gb2);
-  let activePlayer = player1;
-  ui.renderPage(player1Gb, player2Gb);
+  let activePlayer = null;
 
-  const switchPlayerTurn = () => {
+  function switchPlayerTurn() {
     activePlayer = activePlayer === player1 ? player2 : player1;
-  };
+  }
 
-  const getActivePlayer = () => activePlayer;
+  // function tryPlace(gb, coords) {
+  //   try {
+  //     gb.addShip(shipsInGame[0], coords);
+  //     shipsInGame.shift();
+  //   } catch (err) {
+  //     console.log(err.message);
+  //   }
+  // }
+
+  // function placeShip(event, gb) {
+  //   if (gb.getShips().length < shipsInGame.length) {
+  //     tryPlace(gb, ui.getTurnInput(event));
+  //   } else {
+  //     activePlayer = player1;
+  //     event.currentTarget.removeEventListener('click', placeShip);
+  //   }
+  // }
 
   function playRound(player, enemyGb, event) {
     const newGb = player.takeTurn(enemyGb, ui.getTurnInput(event));
@@ -33,31 +54,59 @@ function Game(gb1 = Gameboard(), gb2 = Gameboard(), plr1 = Player(), plr2 = Play
     return result;
   }
 
-  document.querySelector('.player1.gameboard').addEventListener('click', (e) => {
+  ui.renderPage(player1Gb, player2Gb);
+  document.querySelector('.rotate').addEventListener('click', () => {
+    player1Gb.changeNextShipDirection();
+  });
+
+  function placeShip(event) {
+    try {
+      player1Gb = player1Gb.addShip(shipsToPlace[0], ui.getTurnInput(event));
+      shipsToPlace.shift();
+      if (shipsToPlace.length === 0) {
+        activePlayer = player1;
+        ui.hideRotateBtn();
+        event.currentTarget.removeEventListener('click', placeShip);
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+    ui.updateBoard(player1Gb, event.currentTarget);
+  }
+
+  document.querySelector('.player1.gameboard').addEventListener('click', placeShip);
+
+  if (shipsToPlace.length === 0) {
+    activePlayer = player1;
+    ui.hideRotateBtn();
+    document.querySelector('.player1.gameboard').removeEventListener('click', placeShip);
+  }
+
+  document.querySelector('.player1.gameboard').addEventListener('click', (event) => {
     if (
-      !e.target.classList.contains('hit') &&
-      !e.target.classList.contains('miss') &&
-      getActivePlayer() === player2
+      !event.target.classList.contains('hit') &&
+      !event.target.classList.contains('miss') &&
+      activePlayer === player2
     ) {
-      player1Gb = playRound(player2, player1Gb, e);
+      player1Gb = playRound(player2, player1Gb, event);
       const result = getGameResult(player1Gb.ifAllSunk(), player2Gb.ifAllSunk());
       if (result !== undefined) ui.showResult(result);
     }
   });
 
-  document.querySelector('.player2.gameboard').addEventListener('click', (e) => {
+  document.querySelector('.player2.gameboard').addEventListener('click', (event) => {
     if (
-      !e.target.classList.contains('hit') &&
-      !e.target.classList.contains('miss') &&
-      getActivePlayer() === player1
+      !event.target.classList.contains('hit') &&
+      !event.target.classList.contains('miss') &&
+      activePlayer === player1
     ) {
-      player2Gb = playRound(player1, player2Gb, e);
+      player2Gb = playRound(player1, player2Gb, event);
       if (player2.isAI) document.querySelector('.player1.gameboard').click();
     }
   });
 
   document.querySelector('.restart').addEventListener('click', () => {
-    Game(gb1, gb2, plr1, plr2);
+    Game();
   });
 }
 
