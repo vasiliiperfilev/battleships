@@ -5,8 +5,8 @@ let player;
 let AI;
 let gb;
 beforeEach(() => {
-  player = Player();
-  AI = Player(true);
+  player = Player('player1');
+  AI = Player('player2', true);
   gb = Gameboard([5, 4, 3, 3, 2]);
   gb.addShip(2, [0, 0]);
 });

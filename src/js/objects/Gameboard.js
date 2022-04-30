@@ -19,6 +19,8 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
     });
   });
 
+  const getNextShipDirection = () => nextShipDirection;
+
   const getOppositeDirection = () => 1 - nextShipDirection;
 
   const changeNextShipDirection = () => {
@@ -32,6 +34,8 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
   const getShipPosition = (x, y) => board[x][y].position;
 
   const shipsToPlaceLeft = () => shipsToPlaceLengths.length;
+
+  const getNextShipLength = () => shipsToPlaceLengths[0];
 
   function setSquare(ship, position, x, y) {
     if (isValidCoords(x, y)) {
@@ -140,6 +144,8 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
     shipsToPlaceLeft,
     wasSquareAttacked,
     placeShipsRandomly,
+    getNextShipDirection,
+    getNextShipLength,
   };
 }
 

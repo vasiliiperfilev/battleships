@@ -13,7 +13,7 @@ beforeEach(() => {
   gb2 = Gameboard();
   gb1.addShip(2, [0, 0]);
   gb2.addShip(2, [0, 0]);
-  ui.renderPage(gb1, gb2);
+  ui.renderPage(gb1, gb2, 'player1', 'player2');
 });
 
 test('Page render', () => {

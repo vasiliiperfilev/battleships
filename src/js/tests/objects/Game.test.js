@@ -7,9 +7,11 @@ import Player from '../../objects/Player';
 
 describe('Player vs AI ship placement', () => {
   beforeEach(() => {
-    const playerGb = Gameboard([5, 4, 3, 3, 2]);
-    const AiGb = Gameboard([5, 4, 3, 3, 2]);
-    Game(playerGb, AiGb);
+    const gb1 = Gameboard([5, 4, 3, 3, 2]);
+    const gb2 = Gameboard([5, 4, 3, 3, 2]);
+    const plr1 = Player('player1');
+    const plr2 = Player('player2', true);
+    Game({ gb1, gb2, plr1, plr2 });
     // place 5 ships horizontaly
     document.querySelector('.player1.gameboard').children[0].click();
     document.querySelector('.player1.gameboard').children[20].click();
@@ -69,11 +71,13 @@ describe('Player vs AI ship placement', () => {
 describe('Player 1 turns vs AI and wins', () => {
   beforeEach(() => {
     // game created with predefined ships positions
-    const playerGb = Gameboard([3]);
-    const AiGb = Gameboard([2]);
-    playerGb.addShip(3, [0, 0]);
-    AiGb.addShip(2, [0, 0]);
-    Game(playerGb, AiGb);
+    const gb1 = Gameboard([3]);
+    const gb2 = Gameboard([2]);
+    gb1.addShip(3, [0, 0]);
+    gb2.addShip(2, [0, 0]);
+    const plr1 = Player('player1');
+    const plr2 = Player('player2', true);
+    Game({ gb1, gb2, plr1, plr2 });
   });
 
   test('One turn Player vs AI', () => {
@@ -101,11 +105,13 @@ describe('Player 1 turns vs AI and wins', () => {
 describe('Player 2 wins or draw', () => {
   beforeEach(() => {
     // game created with predefined ships positions
-    const player1Gb = Gameboard([2]);
-    const player2Gb = Gameboard([2]);
-    player1Gb.addShip(2, [0, 0]);
-    player2Gb.addShip(2, [0, 0]);
-    Game(player1Gb, player2Gb, Player(), Player());
+    const gb1 = Gameboard([2]);
+    const gb2 = Gameboard([2]);
+    gb1.addShip(2, [0, 0]);
+    gb2.addShip(2, [0, 0]);
+    const plr1 = Player('player1');
+    const plr2 = Player('player2');
+    Game({ gb1, gb2, plr1, plr2 });
   });
 
   test('Player 2 wins', () => {
@@ -130,11 +136,13 @@ describe('Player 2 wins or draw', () => {
 });
 
 test('Restart', () => {
-  let playerGb = Gameboard([3]);
-  let AiGb = Gameboard([2]);
-  playerGb = playerGb.addShip(3, [0, 0]);
-  AiGb = AiGb.addShip(2, [0, 0]);
-  Game(playerGb, AiGb);
+  const gb1 = Gameboard([3]);
+  const gb2 = Gameboard([2]);
+  gb1.addShip(3, [0, 0]);
+  gb2.addShip(2, [0, 0]);
+  const plr1 = Player('player1');
+  const plr2 = Player('player2', true);
+  Game({ gb1, gb2, plr1, plr2 });
   document.querySelector('.player2.gameboard').children[0].click();
   document.querySelector('.player2.gameboard').children[1].click();
   document.querySelector('.restart').click();

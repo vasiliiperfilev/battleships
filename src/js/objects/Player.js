@@ -1,4 +1,6 @@
-function Player(isAI = false) {
+function Player(name, isAI = false) {
+  const getName = () => name;
+
   function getAImove(gameBoard) {
     let coordsArr = [Math.round(Math.random() * 9), Math.round(Math.random() * 9)];
     while (typeof gameBoard.getShipPosition(...coordsArr) === 'string') {
@@ -19,6 +21,7 @@ function Player(isAI = false) {
   return {
     isAI,
     takeTurn,
+    getName,
   };
 }
 

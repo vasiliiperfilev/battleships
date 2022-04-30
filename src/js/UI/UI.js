@@ -28,8 +28,9 @@ function UI() {
     const result = document.createElement('div');
     result.classList.add('result', 'hidden');
     const resultText = document.createElement('span');
-    const restartBtn = document.createElement('btn');
+    const restartBtn = document.createElement('button');
     restartBtn.classList.add('restart');
+    restartBtn.innerText = 'Restart!';
     result.append(resultText, restartBtn);
     return result;
   }
@@ -71,18 +72,17 @@ function UI() {
     });
   }
 
-  function updateBoard(gameBoard, gameBoardDiv) {
+  const updateBoard = (gameBoard, gameBoardDiv) =>
     gameBoardDiv.replaceChildren(...createGbDiv(gameBoard).children);
-  }
 
-  function renderPage(gameBoard1, gameBoard2) {
+  function renderPage(gameBoard1, gameBoard2, player1Name, player2Name) {
     document.querySelector('body').textContent = '';
     const header = createHeader();
     const main = document.createElement('main');
     const gb1Div = document.createElement('div');
     const gb2Div = document.createElement('div');
-    gb1Div.classList.add('player1', 'gameboard');
-    gb2Div.classList.add('player2', 'gameboard');
+    gb1Div.classList.add(player1Name, 'gameboard');
+    gb2Div.classList.add(player2Name, 'gameboard');
     const rotateBtn = createRotateBtn();
     main.append(rotateBtn, gb1Div, gb2Div);
     const footer = createFooter();
@@ -93,17 +93,37 @@ function UI() {
     hideShips(gb2Div);
   }
 
-  function getTurnInput(event) {
-    return [parseInt(event.target.dataset.x, 10), parseInt(event.target.dataset.y, 10)];
-  }
+  const getTurnInput = (event) => [
+    parseInt(event.target.dataset.x, 10),
+    parseInt(event.target.dataset.y, 10),
+  ];
 
   function showResult(result) {
     document.querySelector('.result > span').textContent = result;
     document.querySelector('.result').classList.remove('hidden');
   }
 
-  function hideRotateBtn() {
-    document.querySelector('.rotate').classList.add('hidden');
+  const hideRotateBtn = () => document.querySelector('.rotate').classList.add('hidden');
+
+  const getPlayerGb = (playerName) => document.querySelector(`.${playerName}.gameboard`);
+
+  const isOnSameLine = (sq1, sq2, direction) =>
+    (sq1.dataset.x === sq2.dataset.x && direction === 1) ||
+    (sq1.dataset.y === sq2.dataset.y && direction === 0);
+
+  function mouseMoveHandler(startElement, gameBoard) {
+    const direction = gameBoard.getNextShipDirection();
+    let length = gameBoard.getNextShipLength() - 1;
+    const step = direction === 0 ? 1 : 10;
+    const allSquares = Array.from(startElement.parentNode.children);
+    const startIndex = allSquares.indexOf(startElement);
+    while (length >= 0) {
+      const nextIndex = startIndex + length * step;
+      const nextElement = allSquares[nextIndex];
+      if (nextIndex <= 100 && isOnSameLine(startElement, nextElement, direction))
+        allSquares[nextIndex].classList.toggle('ship-possible');
+      length -= 1;
+    }
   }
 
   return {
@@ -112,6 +132,9 @@ function UI() {
     getTurnInput,
     showResult,
     hideRotateBtn,
+    getPlayerGb,
+    hideShips,
+    mouseMoveHandler,
   };
 }
 
