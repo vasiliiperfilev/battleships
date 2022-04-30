@@ -12,13 +12,13 @@ function UI() {
   function createFooter() {
     const footer = document.createElement('footer');
     const img = document.createElement('img');
-    img.height = '64';
-    img.width = '64';
+    img.height = '32';
+    img.width = '32';
     img.alt = 'git hub logo';
     img.src = GitHubLogo;
     const link = document.createElement('a');
     link.href = 'https://github.com/vasiliiperfilev';
-    footer.textContent = 'Copyright © 2021 Vasilii Perfilev';
+    footer.textContent = 'Copyright © 2022 Vasilii Perfilev';
     link.append(img);
     footer.append(link);
     return footer;
@@ -58,6 +58,13 @@ function UI() {
     return gameBoardDiv;
   }
 
+  function createRotateBtn() {
+    const rotateBtn = document.createElement('button');
+    rotateBtn.classList.add('rotate');
+    rotateBtn.innerText = 'Rotate ship';
+    return rotateBtn;
+  }
+
   function hideShips(gameBoardDiv) {
     [...gameBoardDiv.children].forEach((child) => {
       child.classList.remove('ship');
@@ -76,8 +83,7 @@ function UI() {
     const gb2Div = document.createElement('div');
     gb1Div.classList.add('player1', 'gameboard');
     gb2Div.classList.add('player2', 'gameboard');
-    const rotateBtn = document.createElement('button');
-    rotateBtn.classList.add('rotate');
+    const rotateBtn = createRotateBtn();
     main.append(rotateBtn, gb1Div, gb2Div);
     const footer = createFooter();
     const result = createResult();

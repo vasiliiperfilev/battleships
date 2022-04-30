@@ -24,8 +24,18 @@ describe('testing ship placement', () => {
     });
   });
 
+  test('Corner placement', () => {
+    gb.addShip(2, [8, 0]);
+    [0, 1].forEach((x) => {
+      expect(gb.getShip(8 + x, 0) instanceof Ship).toBe(true);
+      expect(gb.getShipPosition(8 + x, 0)).toBe(x);
+    });
+  });
+
   test('Out of bound placement', () => {
     expect(() => gb.addShip(4, [9, 9])).toThrow('Incorrect square coordinates');
+    expect(gb.getShipPosition(9, 9)).toBe(null);
+    expect(gb.getShip(9, 9)).toBe(null);
   });
 
   test('Ship cross placement', () => {
@@ -37,14 +47,24 @@ describe('testing ship placement', () => {
     gb.addShip(4, [0, 0]);
     expect(() => gb.addShip(3, [4, 0])).toThrow('Space is occupied');
     expect(() => gb.addShip(3, [0, 1])).toThrow('Space is occupied');
+    expect(gb.getShipPosition(0, 1)).toBe(null);
+    expect(gb.getShip(0, 1)).toBe(null);
   });
 
   test('Ships placed around with 1 square gaps', () => {
     gb.addShip(4, [0, 0]);
-    // below
-    expect(() => gb.addShip(3, [5, 0])).not.toThrow();
     // to right
+    expect(() => gb.addShip(3, [5, 0])).not.toThrow();
+    [0, 1, 2].forEach((x) => {
+      expect(gb.getShip(5 + x, 0) instanceof Ship).toBe(true);
+      expect(gb.getShipPosition(5 + x, 0)).toBe(x);
+    });
+    // below
     expect(() => gb.addShip(3, [0, 2])).not.toThrow();
+    [0, 1, 2].forEach((x) => {
+      expect(gb.getShip(x, 2) instanceof Ship).toBe(true);
+      expect(gb.getShipPosition(x, 2)).toBe(x);
+    });
   });
 });
 

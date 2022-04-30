@@ -4,6 +4,14 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
   // initial board constructor
   const board = [];
   const placedShips = [];
+  const occupiedSquares = [];
+  const hitState = 'Hit attack';
+  const missState = 'Missed attack';
+  const incorrectSquareError = new Error('Incorrect square coordinates');
+  const spaceOccupiedError = new Error('Space is occupied');
+  let nextShipDirection = 0;
+  let nextShipStartCoords = null;
+  let nextShipLength = null;
   Array.from(Array(10).keys()).forEach((num1) => {
     board[num1] = [];
     Array.from(Array(10).keys()).forEach((num2) => {
@@ -11,14 +19,10 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
     });
   });
 
-  const hitState = 'Hit attack';
-  const missState = 'Missed attack';
-  let shipDirection = 0;
-
-  const getOppositeDirection = () => 1 - shipDirection;
+  const getOppositeDirection = () => 1 - nextShipDirection;
 
   const changeNextShipDirection = () => {
-    shipDirection = 1 - shipDirection;
+    nextShipDirection = 1 - nextShipDirection;
   };
 
   const isValidCoords = (x, y) => x <= 9 && x >= 0 && y <= 9 && y >= 0;
@@ -34,7 +38,7 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
       board[x][y].ship = ship;
       board[x][y].position = position;
     } else {
-      throw new Error('Incorrect square coordinates');
+      throw incorrectSquareError;
     }
   }
 
@@ -42,31 +46,20 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
     return placedShips.every((ship) => ship.isSunk()) || placedShips.length === 0;
   }
 
-  function checkAdjacentSquares(centerCoords) {
+  function addAdjacentOccupiedSquares(centerCoords) {
     for (let i = -1; i < 2; i += 1) {
       const newCoords = [...centerCoords];
       newCoords[getOppositeDirection()] += i;
       if (isValidCoords(...newCoords)) {
-        if (getShip(...newCoords) !== null) throw new Error('Space is occupied');
+        occupiedSquares.push(newCoords);
       }
     }
   }
 
-  // direction 0 for x, 1 for y in decart
-  function checkFreeSpace(length, startCoordsArr) {
-    const coords = [...startCoordsArr];
-    checkAdjacentSquares(coords);
-    if (length === -1) {
-      return;
-    }
-    coords[shipDirection] += 1;
-    checkFreeSpace(length - 1, coords);
-  }
-
-  function placeShipOnBoard(ship, startCoordsArr) {
+  function placeShipOnBoard(ship) {
     [...Array(ship.getLength()).keys()].forEach((position) => {
-      const coords = [...startCoordsArr];
-      coords[shipDirection] += position;
+      const coords = [...nextShipStartCoords];
+      coords[nextShipDirection] += position;
       setSquare(ship, position, ...coords);
     });
   }
@@ -80,14 +73,35 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
     shipsToPlaceLengths.splice(shipIndex, 1);
   }
 
+  function checkShipSquares() {
+    for (let i = 0; i < nextShipLength; i += 1) {
+      const coords = [...nextShipStartCoords];
+      coords[nextShipDirection] += i;
+      if (!isValidCoords(...coords)) throw incorrectSquareError;
+      if (JSON.stringify(occupiedSquares).includes(JSON.stringify(coords)))
+        throw spaceOccupiedError;
+    }
+  }
+
+  function addToOccupiedSquares() {
+    const startOfOccupied = [...nextShipStartCoords];
+    startOfOccupied[nextShipDirection] -= 1;
+    for (let i = 0; i <= nextShipLength + 1; i += 1) {
+      const coords = [...startOfOccupied];
+      coords[nextShipDirection] += i;
+      addAdjacentOccupiedSquares(coords);
+    }
+  }
+
   function addShip(length, startCoordsArr) {
     const shipLength = length === null ? shipsToPlaceLengths[0] : length;
-    const startOfOccupied = [...startCoordsArr];
-    startOfOccupied[shipDirection] -= 1;
-    checkFreeSpace(shipLength, startOfOccupied);
+    nextShipStartCoords = startCoordsArr;
+    nextShipLength = shipLength;
+    checkShipSquares();
+    addToOccupiedSquares();
     const ship = new Ship(shipLength);
     moveShipToPlaced(ship);
-    placeShipOnBoard(ship, startCoordsArr);
+    placeShipOnBoard(ship);
   }
 
   function receiveAttack([x, y]) {

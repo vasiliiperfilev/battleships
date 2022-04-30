@@ -42,22 +42,27 @@ function Game(gb1 = Gameboard(), gb2 = Gameboard(), plr1 = Player(), plr2 = Play
   function placeShip(gb, event) {
     try {
       gb.addShip(null, ui.getTurnInput(event));
-      if (gb.getShipsToPlaceLengths().length === 0) {
-        activePlayer = player1;
-        ui.hideRotateBtn();
-        event.currentTarget.removeEventListener('click', placeShip);
-      }
     } catch (err) {
       console.log(err.message);
     }
     ui.updateBoard(gb, event.currentTarget);
   }
 
+  function startTurnsPhase(event, oldHandler) {
+    activePlayer = player1;
+    ui.hideRotateBtn();
+    event.currentTarget.removeEventListener('click', oldHandler);
+  }
+
   if (player1Gb.getShipsToPlaceLengths().length > 0) {
     activePlayer = null;
     document
       .querySelector('.player1.gameboard')
-      .addEventListener('click', (event) => placeShip(player1Gb, event));
+      .addEventListener('click', function prepPhaseHandler(event) {
+        placeShip(player1Gb, event);
+        if (player1Gb.getShipsToPlaceLengths().length === 0)
+          startTurnsPhase(event, prepPhaseHandler);
+      });
   }
 
   document.querySelector('.player1.gameboard').addEventListener('click', (event) => {
