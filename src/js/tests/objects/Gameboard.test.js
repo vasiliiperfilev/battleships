@@ -66,6 +66,22 @@ describe('testing ship placement', () => {
       expect(gb.getShipPosition(x, 2)).toBe(x);
     });
   });
+
+  test('Ships random placement', () => {
+    gb.placeShipsRandomly();
+    // no ships left to place
+    expect(gb.shipsToPlaceLeft()).toBe(0);
+    // 5 ships were placed
+    const placed = [];
+    for (let i = 0; i < 10; i += 1) {
+      for (let j = 0; j < 10; j += 1) {
+        if (gb.getShip(i, j) !== null && !placed.includes(gb.getShip(i, j))) {
+          placed.push(gb.getShip(i, j));
+        }
+      }
+    }
+    expect(placed.length).toBe(5);
+  });
 });
 
 describe('testing receiveAttack', () => {

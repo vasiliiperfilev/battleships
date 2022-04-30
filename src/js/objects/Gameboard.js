@@ -31,7 +31,7 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
 
   const getShipPosition = (x, y) => board[x][y].position;
 
-  const getShipsToPlaceLengths = () => [...shipsToPlaceLengths];
+  const shipsToPlaceLeft = () => shipsToPlaceLengths.length;
 
   function setSquare(ship, position, x, y) {
     if (isValidCoords(x, y)) {
@@ -104,6 +104,19 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
     placeShipOnBoard(ship);
   }
 
+  function placeShipsRandomly() {
+    while (shipsToPlaceLengths.length > 0) {
+      let coordsArr = [Math.round(Math.random() * 9), Math.round(Math.random() * 9)];
+      const length = shipsToPlaceLengths[0];
+      try {
+        addShip(length, coordsArr);
+      } catch {
+        coordsArr = [Math.round(Math.random() * 9), Math.round(Math.random() * 9)];
+        changeNextShipDirection();
+      }
+    }
+  }
+
   function receiveAttack([x, y]) {
     if (board[x][y].ship !== null) {
       board[x][y].ship.hit(board[x][y].position);
@@ -124,8 +137,9 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
     addShip,
     receiveAttack,
     ifAllSunk,
-    getShipsToPlaceLengths,
+    shipsToPlaceLeft,
     wasSquareAttacked,
+    placeShipsRandomly,
   };
 }
 

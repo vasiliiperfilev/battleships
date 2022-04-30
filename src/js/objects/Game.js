@@ -48,20 +48,19 @@ function Game(gb1 = Gameboard(), gb2 = Gameboard(), plr1 = Player(), plr2 = Play
     ui.updateBoard(gb, event.currentTarget);
   }
 
-  function startTurnsPhase(event, oldHandler) {
+  function startTurnsPhase(event, placeShipsHandler) {
     activePlayer = player1;
     ui.hideRotateBtn();
-    event.currentTarget.removeEventListener('click', oldHandler);
+    event.currentTarget.removeEventListener('click', placeShipsHandler);
   }
 
-  if (player1Gb.getShipsToPlaceLengths().length > 0) {
+  if (player1Gb.shipsToPlaceLeft() > 0) {
     activePlayer = null;
     document
       .querySelector('.player1.gameboard')
       .addEventListener('click', function prepPhaseHandler(event) {
         placeShip(player1Gb, event);
-        if (player1Gb.getShipsToPlaceLengths().length === 0)
-          startTurnsPhase(event, prepPhaseHandler);
+        if (player1Gb.shipsToPlaceLeft() === 0) startTurnsPhase(event, prepPhaseHandler);
       });
   }
 
@@ -81,7 +80,7 @@ function Game(gb1 = Gameboard(), gb2 = Gameboard(), plr1 = Player(), plr2 = Play
   });
 
   document.querySelector('.restart').addEventListener('click', () => {
-    Game();
+    Game(gb1, gb2, plr1, plr2);
   });
 }
 
