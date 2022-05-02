@@ -125,9 +125,10 @@ function Gameboard(shipsToPlaceLengths = [5, 4, 3, 3, 2]) {
     if (board[x][y].ship !== null) {
       board[x][y].ship.hit(board[x][y].position);
       board[x][y].position = hitState;
-    } else {
-      board[x][y].position = missState;
+      return true;
     }
+    board[x][y].position = missState;
+    return false;
   }
 
   function wasSquareAttacked([x, y]) {

@@ -12,10 +12,9 @@ function Player(name, isAI = false) {
   function takeTurn(gameBoard, coordsArr) {
     const coords = isAI ? getAImove(gameBoard) : coordsArr;
     if (!gameBoard.wasSquareAttacked(coords)) {
-      gameBoard.receiveAttack(coords);
-    } else {
-      throw new Error('Position was attacked before');
+      return gameBoard.receiveAttack(coords);
     }
+    throw new Error('Position was attacked before');
   }
 
   return {

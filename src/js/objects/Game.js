@@ -16,11 +16,13 @@ function Game(options) {
 
   function playRound(player, enemyGb, event) {
     try {
-      player.takeTurn(enemyGb, ui.getTurnInput(event));
-      switchPlayerTurn();
+      const wasShipHit = player.takeTurn(enemyGb, ui.getTurnInput(event));
+      if (!wasShipHit || enemyGb.ifAllSunk()) switchPlayerTurn();
       ui.updateBoard(enemyGb, event.currentTarget);
+      if (player.isAI && wasShipHit) playRound(player, enemyGb, event);
+      if (player2.isAI) ui.hideShips(ui.getPlayerGb(player2.getName()));
     } catch (err) {
-      console.log(err.message);
+      console.log(err.stack);
     }
   }
 
@@ -81,7 +83,6 @@ function Game(options) {
   document.querySelector('.player2.gameboard').addEventListener('click', (event) => {
     if (activePlayer === player1) {
       playRound(player1, player2Gb, event);
-      if (player2.isAI) ui.hideShips(event.currentTarget);
       if (player2.isAI) document.querySelector('.player1.gameboard').click();
     }
   });

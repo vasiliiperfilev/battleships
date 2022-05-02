@@ -82,15 +82,16 @@ describe('Player 1 turns vs AI and wins', () => {
 
   test('One turn Player vs AI', () => {
     document.querySelector('.player2.gameboard').children[0].click();
+    document.querySelector('.player2.gameboard').children[9].click();
     // hit class added to the clicked square of player2(AI) board
     expect(document.querySelector('.player2.gameboard').children[0].classList[0]).toBe('hit');
-    // AI made 1 turn too
+    // AI made 1 turn or more (if hit) too
     expect(
       [...document.querySelector('.player1.gameboard').children].reduce((prev, child) => {
         if (child.classList.contains('hit') || child.classList.contains('miss')) return prev + 1;
         return prev;
-      }, 0)
-    ).toBe(1);
+      }, 0) >= 1
+    ).toBe(true);
   });
 
   test('Player wins', () => {
@@ -117,17 +118,20 @@ describe('Player 2 wins or draw', () => {
   test('Player 2 wins', () => {
     // Players turns to simulate Player 2 win
     document.querySelector('.player2.gameboard').children[0].click();
+    document.querySelector('.player2.gameboard').children[9].click();
     document.querySelector('.player1.gameboard').children[0].click();
-    document.querySelector('.player2.gameboard').children[2].click();
     document.querySelector('.player1.gameboard').children[1].click();
+    document.querySelector('.player2.gameboard').children[12].click();
     expect(document.querySelector('.result').classList.contains('hidden')).toBe(false);
     expect(document.querySelector('.result > span').textContent).toBe('Player 2 won!');
   });
 
   test('Draw', () => {
-    // Players turns to simulate Player 2 win
+    // Players turns to simulate draw
     document.querySelector('.player2.gameboard').children[0].click();
+    document.querySelector('.player2.gameboard').children[9].click();
     document.querySelector('.player1.gameboard').children[0].click();
+    document.querySelector('.player1.gameboard').children[9].click();
     document.querySelector('.player2.gameboard').children[1].click();
     document.querySelector('.player1.gameboard').children[1].click();
     expect(document.querySelector('.result').classList.contains('hidden')).toBe(false);
