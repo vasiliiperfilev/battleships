@@ -1,6 +1,7 @@
 import GitHubLogo from '../../assets/GitHubLogo.png';
 
 function UI() {
+  // creates page header
   function createHeader() {
     const header = document.createElement('header');
     const h1 = document.createElement('h1');
@@ -8,7 +9,7 @@ function UI() {
     header.append(h1);
     return header;
   }
-
+  // creates page footer
   function createFooter() {
     const footer = document.createElement('footer');
     const img = document.createElement('img');
@@ -23,7 +24,7 @@ function UI() {
     footer.append(link);
     return footer;
   }
-
+  // creates result window with restart button to show after the game
   function createResult() {
     const result = document.createElement('div');
     result.classList.add('result', 'hidden');
@@ -34,7 +35,7 @@ function UI() {
     result.append(resultText, restartBtn);
     return result;
   }
-
+  // adds class to square if that square was attacked or has ship
   function styleGbSquare(square, state) {
     if (state === 'Hit attack') {
       square.classList.add('hit');
@@ -44,7 +45,7 @@ function UI() {
       square.classList.add('ship');
     }
   }
-
+  // creates gb, adds x and y values to each square
   function createGbDiv(gameBoard) {
     const gameBoardDiv = document.createElement('div');
     Array.from(Array(10).keys()).forEach((num1) => {
@@ -58,23 +59,23 @@ function UI() {
     });
     return gameBoardDiv;
   }
-
+  // creates rotate btn to rotate ships
   function createRotateBtn() {
     const rotateBtn = document.createElement('button');
     rotateBtn.classList.add('rotate');
     rotateBtn.innerText = 'Rotate ship';
     return rotateBtn;
   }
-
+  // hides ships by removing ships class from squares
   function hideShips(gameBoardDiv) {
     [...gameBoardDiv.children].forEach((child) => {
       child.classList.remove('ship');
     });
   }
-
+  // rerenders all squares of board
   const updateBoard = (gameBoard, gameBoardDiv) =>
     gameBoardDiv.replaceChildren(...createGbDiv(gameBoard).children);
-
+  // renders whole page
   function renderPage(gameBoard1, gameBoard2, player1Name, player2Name) {
     document.querySelector('body').textContent = '';
     const header = createHeader();
@@ -84,6 +85,7 @@ function UI() {
     gb1Div.classList.add(player1Name, 'gameboard');
     gb2Div.classList.add(player2Name, 'gameboard');
     const rotateBtn = createRotateBtn();
+    rotateBtn.addEventListener('click', () => gameBoard1.changeNextShipDirection());
     main.append(rotateBtn, gb1Div, gb2Div);
     const footer = createFooter();
     const result = createResult();
@@ -92,25 +94,26 @@ function UI() {
     updateBoard(gameBoard2, gb2Div);
     hideShips(gb2Div);
   }
-
+  // returns array of x and y from event target(square)
   const getTurnInput = (event) => [
     parseInt(event.target.dataset.x, 10),
     parseInt(event.target.dataset.y, 10),
   ];
-
+  // shows result window with text from input value
   function showResult(result) {
     document.querySelector('.result > span').textContent = result;
     document.querySelector('.result').classList.remove('hidden');
   }
-
+  // hides rotate ship button
   const hideRotateBtn = () => document.querySelector('.rotate').classList.add('hidden');
-
+  // returns players gb element by player name
   const getPlayerGb = (playerName) => document.querySelector(`.${playerName}.gameboard`);
-
+  // returns if two squares are on the same line of particular direction 0 - X, 1- Y;
+  // if squares have same x they're on the same line of Y direction and vice versa
   const isOnSameLine = (sq1, sq2, direction) =>
     (sq1.dataset.x === sq2.dataset.x && direction === 1) ||
     (sq1.dataset.y === sq2.dataset.y && direction === 0);
-
+  // shows potential ship shadow. Handles mouseover and mouse out events
   function mouseMoveHandler(startElement, gameBoard) {
     const direction = gameBoard.getNextShipDirection();
     let length = gameBoard.getNextShipLength() - 1;
@@ -119,11 +122,18 @@ function UI() {
     const startIndex = allSquares.indexOf(startElement);
     while (length >= 0) {
       const nextIndex = startIndex + length * step;
-      const nextElement = allSquares[nextIndex];
-      if (nextIndex <= 100 && isOnSameLine(startElement, nextElement, direction))
-        allSquares[nextIndex].classList.toggle('ship-possible');
+      if (nextIndex < 100) {
+        const nextElement = allSquares[nextIndex];
+        if (isOnSameLine(startElement, nextElement, direction))
+          allSquares[nextIndex].classList.toggle('ship-possible');
+      }
       length -= 1;
     }
+  }
+  // copies element and places it to the same dom position removing event listeners
+  function copyWithoutEventListeners(element) {
+    const gbDiv = element.cloneNode(true);
+    element.parentNode.replaceChild(gbDiv, element);
   }
 
   return {
@@ -135,6 +145,7 @@ function UI() {
     getPlayerGb,
     hideShips,
     mouseMoveHandler,
+    copyWithoutEventListeners,
   };
 }
 

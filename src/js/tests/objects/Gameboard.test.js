@@ -1,5 +1,4 @@
 import Gameboard from '../../objects/Gameboard';
-import Ship from '../../objects/Ship';
 
 let gb;
 beforeEach(() => {
@@ -10,7 +9,9 @@ describe('testing ship placement', () => {
   test('Normal placement by x ax', () => {
     gb.addShip(4, [0, 0]);
     [0, 1, 2, 3].forEach((x) => {
-      expect(gb.getShip(x, 0) instanceof Ship).toBe(true);
+      // duck typing check
+      expect(Object.prototype.hasOwnProperty.call(gb.getShip(x, 0), 'hit')).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(gb.getShip(x, 0), 'isSunk')).toBe(true);
       expect(gb.getShipPosition(x, 0)).toBe(x);
     });
   });
@@ -19,7 +20,8 @@ describe('testing ship placement', () => {
     gb.changeNextShipDirection();
     gb.addShip(4, [0, 0]);
     [0, 1, 2, 3].forEach((y) => {
-      expect(gb.getShip(0, y) instanceof Ship).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(gb.getShip(0, y), 'hit')).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(gb.getShip(0, y), 'isSunk')).toBe(true);
       expect(gb.getShipPosition(0, y)).toBe(y);
     });
   });
@@ -27,7 +29,7 @@ describe('testing ship placement', () => {
   test('Corner placement', () => {
     gb.addShip(2, [8, 0]);
     [0, 1].forEach((x) => {
-      expect(gb.getShip(8 + x, 0) instanceof Ship).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(gb.getShip(8 + x, 0), 'hit')).toBe(true);
       expect(gb.getShipPosition(8 + x, 0)).toBe(x);
     });
   });
@@ -56,13 +58,15 @@ describe('testing ship placement', () => {
     // to right
     expect(() => gb.addShip(3, [5, 0])).not.toThrow();
     [0, 1, 2].forEach((x) => {
-      expect(gb.getShip(5 + x, 0) instanceof Ship).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(gb.getShip(5 + x, 0), 'hit')).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(gb.getShip(5 + x, 0), 'isSunk')).toBe(true);
       expect(gb.getShipPosition(5 + x, 0)).toBe(x);
     });
     // below
     expect(() => gb.addShip(3, [0, 2])).not.toThrow();
     [0, 1, 2].forEach((x) => {
-      expect(gb.getShip(x, 2) instanceof Ship).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(gb.getShip(x, 2), 'hit')).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(gb.getShip(x, 2), 'isSunk')).toBe(true);
       expect(gb.getShipPosition(x, 2)).toBe(x);
     });
   });
@@ -70,7 +74,7 @@ describe('testing ship placement', () => {
   test('Ships random placement', () => {
     gb.placeShipsRandomly();
     // no ships left to place
-    expect(gb.shipsToPlaceLeft()).toBe(0);
+    expect(gb.getShipsToPlaceLeft()).toBe(0);
     // 5 ships were placed
     const placed = [];
     for (let i = 0; i < 10; i += 1) {

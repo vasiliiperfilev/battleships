@@ -9,23 +9,23 @@ function Game(options) {
   const player1Gb = options.gb1 || Gameboard();
   const player2Gb = options.gb2 || Gameboard();
   let activePlayer = player1;
+  let activePlayerGb = player1Gb;
+  // returns if both boards has their ships placed
+  const canStart = () =>
+    player1Gb.getShipsToPlaceLeft() === 0 && player2Gb.getShipsToPlaceLeft() === 0;
 
-  function switchPlayerTurn() {
+  // switches active player, updates UI and triggers AI action if required
+  function switchActivePlayer(AIlistenerElement) {
+    // hide current active player ships
+    ui.hideShips(ui.getPlayerGb(activePlayer.getName()));
     activePlayer = activePlayer === player1 ? player2 : player1;
+    activePlayerGb = activePlayerGb === player1Gb ? player2Gb : player1Gb;
+    // show new active player ships
+    ui.updateBoard(activePlayerGb, ui.getPlayerGb(activePlayer.getName()));
+    // triggers AI action if any
+    if (activePlayer === player2 && player2.isAI) AIlistenerElement.click();
   }
-
-  function playRound(player, enemyGb, event) {
-    try {
-      const wasShipHit = player.takeTurn(enemyGb, ui.getTurnInput(event));
-      if (!wasShipHit || enemyGb.ifAllSunk()) switchPlayerTurn();
-      ui.updateBoard(enemyGb, event.currentTarget);
-      if (player.isAI && wasShipHit) playRound(player, enemyGb, event);
-      if (player2.isAI) ui.hideShips(ui.getPlayerGb(player2.getName()));
-    } catch (err) {
-      console.log(err.stack);
-    }
-  }
-
+  // returns game result if any or undefined otherwise
   function getGameResult(isAllSunkPlayer1, isAllSunkPlayer2) {
     let result;
     if (isAllSunkPlayer1) result = 'Player 2 won!';
@@ -33,63 +33,76 @@ function Game(options) {
     if (isAllSunkPlayer2 && isAllSunkPlayer1) result = 'Draw!';
     return result;
   }
-
-  ui.renderPage(player1Gb, player2Gb, player1.getName(), player2.getName());
-
-  document
-    .querySelector('.rotate')
-    .addEventListener('click', () => player1Gb.changeNextShipDirection());
-
-  function placeShip(gb, event) {
-    try {
-      gb.addShip(null, ui.getTurnInput(event));
-    } catch (err) {
-      console.log(err.message);
+  // attacks clicked square, updates UI, switches active player and repeat AI attack if AI hit before
+  function attackHandler(event, opponentGb, player) {
+    if (player === activePlayer) {
+      const wasShipHit = player.takeTurn(opponentGb, ui.getTurnInput(event));
+      ui.updateBoard(opponentGb, event.currentTarget);
+      // hide opponent gb ships after update
+      ui.hideShips(event.currentTarget);
+      if (!wasShipHit || opponentGb.ifAllSunk())
+        switchActivePlayer(ui.getPlayerGb(player1.getName()));
+      if (player.isAI && wasShipHit) attackHandler(event, opponentGb, player);
     }
-    ui.updateBoard(gb, event.currentTarget);
   }
 
-  function startTurnsPhase(event, placeShipsHandler) {
-    player2Gb.placeShipsRandomly();
-    activePlayer = player1;
+  // hide preparation phase UI, setup attack event listeners and restart button
+  function setupAttackPhase() {
     ui.hideRotateBtn();
-    event.currentTarget.removeEventListener('click', placeShipsHandler);
-  }
-
-  if (player1Gb.shipsToPlaceLeft() > 0) {
-    activePlayer = null;
-    document
-      .querySelector('.player1.gameboard')
-      .addEventListener('click', function prepPhaseHandler(event) {
-        placeShip(player1Gb, event);
-        if (player1Gb.shipsToPlaceLeft() === 0) startTurnsPhase(event, prepPhaseHandler);
-      });
-    document.querySelector('.player1.gameboard').addEventListener('mouseover', (event) => {
-      ui.mouseMoveHandler(event.target, player1Gb);
-    });
-    document.querySelector('.player1.gameboard').addEventListener('mouseout', (event) => {
-      ui.mouseMoveHandler(event.target, player1Gb);
-    });
-  }
-
-  document.querySelector('.player1.gameboard').addEventListener('click', (event) => {
-    if (activePlayer === player2) {
-      playRound(player2, player1Gb, event);
+    // check for game results after player 2 turn
+    ui.getPlayerGb(player1.getName()).addEventListener('click', (event) => {
+      attackHandler(event, player1Gb, player2);
       const result = getGameResult(player1Gb.ifAllSunk(), player2Gb.ifAllSunk());
       if (result !== undefined) ui.showResult(result);
+    });
+    ui.getPlayerGb(player2.getName()).addEventListener('click', (event) => {
+      attackHandler(event, player2Gb, player1);
+    });
+    document.querySelector('.restart').addEventListener('click', () => {
+      Game({});
+    });
+  }
+  // hides player ships, remove preparation phase event listeners and switch active player
+  function finishPlayerPreparation(event) {
+    ui.hideShips(event.currentTarget);
+    ui.copyWithoutEventListeners(event.currentTarget);
+    switchActivePlayer(ui.getPlayerGb(player2.getName()));
+  }
+  // places ship on click coords and updates UI
+  function preparationHandler(event, gb, player) {
+    if (gb.getShipsToPlaceLeft() > 0 && player === activePlayer) {
+      player.placeShip(gb, ui.getTurnInput(event));
+      ui.updateBoard(gb, event.currentTarget);
+      // if can start the game finish this player preparation and setup attack phase
+      if (canStart()) {
+        finishPlayerPreparation(event);
+        setupAttackPhase();
+        // else if all ships were placed but can't start yet finish this player preparation
+      } else if (gb.getShipsToPlaceLeft() === 0) {
+        finishPlayerPreparation(event);
+      }
     }
-  });
+  }
 
-  document.querySelector('.player2.gameboard').addEventListener('click', (event) => {
-    if (activePlayer === player1) {
-      playRound(player1, player2Gb, event);
-      if (player2.isAI) document.querySelector('.player1.gameboard').click();
-    }
-  });
+  // setup preparation event listeners - ship placements and a potential ship shadow on mouseover
+  function setupPreparationPhase() {
+    ui.getPlayerGb(player1.getName()).addEventListener('mouseover', (event) => {
+      ui.mouseMoveHandler(event.target, player1Gb);
+    });
+    ui.getPlayerGb(player1.getName()).addEventListener('mouseout', (event) => {
+      ui.mouseMoveHandler(event.target, player1Gb);
+    });
+    ui.getPlayerGb(player1.getName()).addEventListener('click', (event) => {
+      preparationHandler(event, player1Gb, player1);
+    });
+    ui.getPlayerGb(player2.getName()).addEventListener('click', (event) => {
+      preparationHandler(event, player2Gb, player2);
+    });
+  }
 
-  document.querySelector('.restart').addEventListener('click', () => {
-    Game({});
-  });
+  // start game
+  ui.renderPage(player1Gb, player2Gb, player1.getName(), player2.getName());
+  setupPreparationPhase();
 }
 
 export default Game;

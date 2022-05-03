@@ -68,23 +68,28 @@ describe('Player vs AI ship placement', () => {
   });
 });
 
-describe('Player 1 turns vs AI and wins', () => {
+describe('Player 1 turns vs AI', () => {
   beforeEach(() => {
     // game created with predefined ships positions
     const gb1 = Gameboard([3]);
     const gb2 = Gameboard([2]);
-    gb1.addShip(3, [0, 0]);
-    gb2.addShip(2, [0, 0]);
     const plr1 = Player('player1');
     const plr2 = Player('player2', true);
     Game({ gb1, gb2, plr1, plr2 });
+    // placing ships
+    document.querySelector('.player1.gameboard').children[0].click();
   });
 
   test('One turn Player vs AI', () => {
     document.querySelector('.player2.gameboard').children[0].click();
+    // miss to give turn to AI
     document.querySelector('.player2.gameboard').children[9].click();
     // hit class added to the clicked square of player2(AI) board
-    expect(document.querySelector('.player2.gameboard').children[0].classList[0]).toBe('hit');
+    expect(
+      ['hit', 'miss'].includes(
+        document.querySelector('.player2.gameboard').children[0].classList[0]
+      )
+    ).toBe(true);
     // AI made 1 turn or more (if hit) too
     expect(
       [...document.querySelector('.player1.gameboard').children].reduce((prev, child) => {
@@ -93,26 +98,31 @@ describe('Player 1 turns vs AI and wins', () => {
       }, 0) >= 1
     ).toBe(true);
   });
-
-  test('Player wins', () => {
-    expect(document.querySelector('.result').classList.contains('hidden')).toBe(true);
-    document.querySelector('.player2.gameboard').children[0].click();
-    document.querySelector('.player2.gameboard').children[1].click();
-    expect(document.querySelector('.result').classList.contains('hidden')).toBe(false);
-    expect(document.querySelector('.result > span').textContent).toBe('Player 1 won!');
-  });
 });
 
-describe('Player 2 wins or draw', () => {
+describe('Game results', () => {
   beforeEach(() => {
     // game created with predefined ships positions
     const gb1 = Gameboard([2]);
     const gb2 = Gameboard([2]);
-    gb1.addShip(2, [0, 0]);
-    gb2.addShip(2, [0, 0]);
     const plr1 = Player('player1');
     const plr2 = Player('player2');
     Game({ gb1, gb2, plr1, plr2 });
+    // placing ships
+    document.querySelector('.player1.gameboard').children[0].click();
+    document.querySelector('.player2.gameboard').children[0].click();
+  });
+
+  test('Player1 wins', () => {
+    // Players turns to simulate Player 1 win
+    document.querySelector('.player2.gameboard').children[0].click();
+    document.querySelector('.player2.gameboard').children[9].click();
+    document.querySelector('.player1.gameboard').children[0].click();
+    document.querySelector('.player1.gameboard').children[12].click();
+    document.querySelector('.player2.gameboard').children[1].click();
+    document.querySelector('.player1.gameboard').children[13].click();
+    expect(document.querySelector('.result').classList.contains('hidden')).toBe(false);
+    expect(document.querySelector('.result > span').textContent).toBe('Player 1 won!');
   });
 
   test('Player 2 wins', () => {
@@ -142,13 +152,16 @@ describe('Player 2 wins or draw', () => {
 test('Restart', () => {
   const gb1 = Gameboard([3]);
   const gb2 = Gameboard([2]);
-  gb1.addShip(3, [0, 0]);
   gb2.addShip(2, [0, 0]);
   const plr1 = Player('player1');
   const plr2 = Player('player2', true);
   Game({ gb1, gb2, plr1, plr2 });
+  // placing ships
+  document.querySelector('.player1.gameboard').children[0].click();
+  // attacks
   document.querySelector('.player2.gameboard').children[0].click();
   document.querySelector('.player2.gameboard').children[1].click();
+  // restart
   document.querySelector('.restart').click();
   // result hidden
   expect(document.querySelector('.result').classList.contains('hidden')).toBe(true);
