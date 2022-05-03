@@ -8,3 +8,4 @@ Features:
 - All game logic fully implemented (ships positioning, if hit can attack again, draw is possible)
 
 JS, Webpack and Jest were used in this project
+Live: https://vasiliiperfilev.github.io/battleships/
